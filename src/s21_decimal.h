@@ -38,6 +38,14 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
 
+// Сравнение
+int s21_is_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_greater(s21_decimal value_1, s21_decimal value_2);
+int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_less(s21_decimal value_1, s21_decimal value_2);
+
 // Вспомогательные функции
 int get_dec_bit(s21_decimal src, int pos);
 void set_dec_bit(s21_decimal *dst, int pos);
@@ -53,9 +61,24 @@ void bigdec_to_dec(s21_bigdecimal src, s21_decimal *dst);
 void print_bigdecimal_bits(s21_bigdecimal num);
 int get_bigdec_sign(s21_bigdecimal src);
 void left_shift_big(s21_bigdecimal *src, int shift);
+s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift);
 int get_bigdec_bit(s21_bigdecimal src, int pos);
 void set_bigdec_bit(s21_bigdecimal *dst, int pos);
+int is_bigdec_zero(s21_bigdecimal src);
+void set_bigdec_sign(s21_bigdecimal *dst, int sign);
 
+int words_sum(int a, int b, int *sum);
 int bigdec_add_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+int words_sub(int a, int b, int *sub);
+int bigdec_sub_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+
+void bigdec_scale_equilizer(s21_bigdecimal *a, s21_bigdecimal *b);
+
+void print_uint_bits(uint64_t num);
+void print_int_bits(int num);
+
+void bigdec_mul_by_10(s21_bigdecimal *src);
+void bigdec_equilizer(s21_bigdecimal *a, s21_bigdecimal *b);
+void set_bigdec_scale(s21_bigdecimal *dst, int scale);
 
 #endif
