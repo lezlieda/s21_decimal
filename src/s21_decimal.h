@@ -56,23 +56,24 @@ int get_float_scale(float src);
 void float_rounder(double *src);
 void print_float_bits(float num);
 void print_decimal_bits(s21_decimal num);
-void dec_to_bigdec(s21_decimal src, s21_bigdecimal *dst);
-void bigdec_to_dec(s21_bigdecimal src, s21_decimal *dst);
+void decimal_to_bigdec(s21_decimal src, s21_bigdecimal *dst);
+void bigdec_to_decimal(s21_bigdecimal src, s21_decimal *dst);
 void print_bigdecimal_bits(s21_bigdecimal num);
 int get_bigdec_sign(s21_bigdecimal src);
 void left_shift_big(s21_bigdecimal *src, int shift);
-s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift);
+void right_shift_big(s21_bigdecimal *src, int shift);
+// s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift);
 int get_bigdec_bit(s21_bigdecimal src, int pos);
 void set_bigdec_bit(s21_bigdecimal *dst, int pos);
 int is_bigdec_zero(s21_bigdecimal src);
 void set_bigdec_sign(s21_bigdecimal *dst, int sign);
 
 int words_sum(int a, int b, int *sum);
-int bigdec_add_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+int add_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 int words_sub(int a, int b, int *sub);
-int bigdec_sub_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+int sub_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 
-void bigdec_scale_equilizer(s21_bigdecimal *a, s21_bigdecimal *b);
+void scale_equilizer_bigdec(s21_bigdecimal *a, s21_bigdecimal *b);
 
 void print_uint_bits(uint64_t num);
 void print_int_bits(int num);

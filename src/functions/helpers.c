@@ -94,7 +94,7 @@ void print_decimal_bits(s21_decimal num) {
   }
 }
 
-void dec_to_bigdec(s21_decimal src, s21_bigdecimal *dst) {
+void decimal_to_bigdec(s21_decimal src, s21_bigdecimal *dst) {
   *dst = (s21_bigdecimal){0};
   dst->bits[0] = src.bits[0];
   dst->bits[1] = src.bits[1];
@@ -102,7 +102,7 @@ void dec_to_bigdec(s21_decimal src, s21_bigdecimal *dst) {
   dst->bits[7] = src.bits[3];
 }
 
-void bigdec_to_dec(s21_bigdecimal src, s21_decimal *dst) {
+void bigdec_to_decimal(s21_bigdecimal src, s21_decimal *dst) {
   *dst = (s21_decimal){0};
   dst->bits[0] = src.bits[0];
   dst->bits[1] = src.bits[1];
@@ -154,18 +154,31 @@ void left_shift_big(s21_bigdecimal *src, int shift) {
   }
 }
 
-s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift) {
+void right_shift_big(s21_bigdecimal *src, int shift) {
   s21_bigdecimal tmp = {0};
-  tmp.bits[7] = src.bits[7];
   for (int i = 0; i < 223 - shift; i++) {
-    if (get_bigdec_bit(src, i + shift)) set_bigdec_bit(&tmp, i);
+    if (get_bigdec_bit(*src, i + shift)) set_bigdec_bit(&tmp, i);
   }
-  return tmp;
+  tmp.bits[7] = src->bits[7];
+  *src = tmp;
 }
+
+// s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift) {
+//   s21_bigdecimal tmp = {0};
+//   tmp.bits[7] = src.bits[7];
+//   for (int i = 0; i < 223 - shift; i++) {
+//     if (get_bigdec_bit(src, i + shift)) set_bigdec_bit(&tmp, i);
+//   }
+//   return tmp;
+// }
 
 void print_uint_bits(uint64_t num) {
   for (int i = 63; i >= 0; i--) {
+#ifdef __macos__
     printf("%lld", (num >> i) & 1);
+#elif __linux__
+    printf("%ld", (num >> i) & 1);
+#endif
   }
   printf("\n");
 }
@@ -211,7 +224,7 @@ int words_sub(int a, int b, int *sub) {
   return shift;
 }
 
-int bigdec_add_noscale(s21_bigdecimal a, s21_bigdecimal b,
+int add_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
                        s21_bigdecimal *res) {
   *res = (s21_bigdecimal){0};
   int error = 0;
@@ -225,12 +238,12 @@ int bigdec_add_noscale(s21_bigdecimal a, s21_bigdecimal b,
   for (int i = 0; i < 7; i++) {
     if (tmp.bits[i] != 0) flag = 1;
   }
-  if (flag) bigdec_add_noscale(*res, tmp, res);
+  if (flag) add_bigdec_noscale(*res, tmp, res);
   if (carry) error = 1;
   return error;
 }
 
-int bigdec_sub_noscale(s21_bigdecimal a, s21_bigdecimal b,
+int sub_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
                        s21_bigdecimal *res) {
   *res = (s21_bigdecimal){0};
   int error = 0;
@@ -244,7 +257,7 @@ int bigdec_sub_noscale(s21_bigdecimal a, s21_bigdecimal b,
   for (int i = 0; i < 7; i++) {
     if (tmp.bits[i] != 0) flag = 1;
   }
-  if (flag) bigdec_sub_noscale(*res, tmp, res);
+  if (flag) sub_bigdec_noscale(*res, tmp, res);
   if (carry) error = 1;
   return error;
 }
@@ -253,20 +266,27 @@ void bigdec_mul_by_10(s21_bigdecimal *src) {
   s21_bigdecimal tmp = *src;
   left_shift_big(src, 3);
   left_shift_big(&tmp, 1);
-  bigdec_add_noscale(*src, tmp, src);
+  add_bigdec_noscale(*src, tmp, src);
 }
 
-void bigdec_scale_equilizer(s21_bigdecimal *a, s21_bigdecimal *b) {
+// void bigdec_div_by_10(s21_bigdecimal *src) {
+
+// }
+
+void scale_equilizer_bigdec(s21_bigdecimal *a, s21_bigdecimal *b) {
   int scale_a = get_bigdec_scale(*a);
   int scale_b = get_bigdec_scale(*b);
   if (scale_a > scale_b) {
     for (int i = 0; i < scale_a - scale_b; i++) {
       bigdec_mul_by_10(b);
     }
+    set_bigdec_scale(b, scale_a);
+
   } else if (scale_a < scale_b) {
     for (int i = 0; i < scale_b - scale_a; i++) {
       bigdec_mul_by_10(a);
     }
+    set_bigdec_scale(a, scale_b);
   }
 }
 
@@ -277,3 +297,20 @@ int is_bigdec_zero(s21_bigdecimal src) {
   }
   return flag;
 }
+
+// int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+//   int error = 0;
+//   if (result == NULL) {
+//     error = 1;
+//   } else {
+//     s21_bigdecimal big_1 = {0};
+//     s21_bigdecimal big_2 = {0};
+//     s21_bigdecimal big_res = {0};
+//     decimal_to_bigdec(value_1, &big_1);
+//     decimal_to_bigdec(value_2, &big_2);
+//     bigdec_equilizer(&big_1, &big_2);
+//     add_bigdec_noscale(big_1, big_2, &big_res);
+
+//   }
+//   return error;
+// }

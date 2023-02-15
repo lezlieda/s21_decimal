@@ -4,9 +4,9 @@ int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
   int result = 0;
   s21_bigdecimal bigdec_1 = {0};
   s21_bigdecimal bigdec_2 = {0};
-  dec_to_bigdec(value_1, &bigdec_1);
-  dec_to_bigdec(value_2, &bigdec_2);
-  bigdec_scale_equilizer(&bigdec_1, &bigdec_2);
+  decimal_to_bigdec(value_1, &bigdec_1);
+  decimal_to_bigdec(value_2, &bigdec_2);
+  scale_equilizer_bigdec(&bigdec_1, &bigdec_2);
   if (is_bigdec_zero(bigdec_1) && is_bigdec_zero(bigdec_2)) {
     result = 1;
   } else if (get_bigdec_sign(bigdec_1) == get_bigdec_sign(bigdec_2)) {
@@ -39,9 +39,9 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   int result = 0;
   s21_bigdecimal bigdec_1 = {0};
   s21_bigdecimal bigdec_2 = {0};
-  dec_to_bigdec(value_1, &bigdec_1);
-  dec_to_bigdec(value_2, &bigdec_2);
-  bigdec_scale_equilizer(&bigdec_1, &bigdec_2);
+  decimal_to_bigdec(value_1, &bigdec_1);
+  decimal_to_bigdec(value_2, &bigdec_2);
+  scale_equilizer_bigdec(&bigdec_1, &bigdec_2);
   int sign_1 = get_bigdec_sign(bigdec_1);
   int sign_2 = get_bigdec_sign(bigdec_2);
   if (sign_1 == 0 && sign_2 == 1) {
