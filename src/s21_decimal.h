@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MIN_DECIMAL 1e-28
-#define MAX_DECIMAL 79228162514264337593543950335.0
-
 typedef struct {
   int bits[4];
 } s21_decimal;
@@ -75,10 +72,16 @@ int sub_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 
 void scale_equilizer_bigdec(s21_bigdecimal *a, s21_bigdecimal *b);
 
-void print_uint_bits(uint64_t num);
+void print_uint_bits(int64_t num);
 void print_int_bits(int num);
 
+int is_equal_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2);
+int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2);
+
+int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+
 void bigdec_mul_by_10(s21_bigdecimal *src);
+void bigdec_div_by_10(s21_bigdecimal *src);
 void bigdec_equilizer(s21_bigdecimal *a, s21_bigdecimal *b);
 void set_bigdec_scale(s21_bigdecimal *dst, int scale);
 

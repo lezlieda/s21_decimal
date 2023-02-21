@@ -1,62 +1,69 @@
 #include "s21_decimal.h"
 
 int main() {
-  s21_decimal a = {0};
-  a.bits[0] = 0xFFFFFFFD;
-  a.bits[1] = 0xFFFFFFFF;
-  a.bits[2] = 0xFFFFFFFF;
-  // a.bits[3] = 28 << 16;
-  // print_decimal_bits(a);
+  s21_bigdecimal a = {0};
+  a.bits[0] = 918919191;
+  a.bits[1] = 1;
+  a.bits[3] = 0xF << 28;
+  a.bits[4] = 0xF << 28;
+  a.bits[5] = 0xF << 28;
+  a.bits[6] = 0xF << 28;
+  a.bits[7] = 5 << 16;
+  print_uint_bits(a.bits[6]);
+  printf("a:\n");
+  print_bigdecimal_bits(a);
+  right_shift_big(&a, 45);
+  printf("a >> 45:\n");
+  print_bigdecimal_bits(a);
 
-  // float aa = 0;
-  // s21_from_decimal_to_float(a, &aa);
-  // printf("aa = %f\n", aa);
-
-  s21_decimal b = {0};
-  b.bits[0] = 0x5;
-  b.bits[3] = 1 << 16;
-  // print_decimal_bits(b);
-  // float bb = 0;
-  // s21_from_decimal_to_float(b, &bb);
-  // printf("bb = %f\n", bb);
-
-  s21_bigdecimal aaa = {0};
-  s21_bigdecimal bbb = {0};
-  decimal_to_bigdec(a, &aaa);
-  printf("aaa:\n");
-  print_bigdecimal_bits(aaa);
-  decimal_to_bigdec(b, &bbb);
-  printf("bbb:\n");
-  print_bigdecimal_bits(bbb);
-  s21_bigdecimal ccc = {0};
-  scale_equilizer_bigdec(&aaa, &bbb);
-  int scale = get_bigdec_scale(bbb);
-  printf("scale = %d\n", scale);
-  add_bigdec_noscale(aaa, bbb, &ccc);
-  ccc.bits[7] |= scale << 16;
-  print_bigdecimal_bits(ccc);
-  s21_decimal ddd = {0};
-  bigdec_to_decimal(ccc, &ddd);
-  print_decimal_bits(ddd);
+  // s21_bigdecimal b = {0};
+  // b.bits[0] = 785;
+  // printf("b:\n");
+  // print_bigdecimal_bits(b);
+  // bigdec_to_decimal(b, &aa);
+  // s21_from_decimal_to_float(aa, &aaa);
+  // printf("float b: %.8f\n", aaa);
 
   // s21_bigdecimal c = {0};
-  // c.bits[5] = 0xFFFFFFFF;
-  // c.bits[7] = 25 << 16;
-  // // c.bits[1] = 0x000EB0B0;
+  // mul_bigdec_noscale(a, b, &c);
+  // c.bits[7] = 5 << 16;
   // print_bigdecimal_bits(c);
-  // s21_decimal d = {0};
-  // bigdec_to_dec(c, &d);
-  // float dd = 0;
-  // s21_from_decimal_to_float(d, &dd);
-  // printf("dd = %f\n", dd);
-  // printf("\n");
-  // bigdec_mul_by_10(&c);
-  // print_bigdecimal_bits(c);
-  // bigdec_to_dec(c, &d);
-  // s21_from_decimal_to_float(d, &dd);
-  // printf("dd = %f\n", dd);
-  // right_shift_big(&c, 4);
-  // print_bigdecimal_bits(c);
+
+  // bigdec_to_decimal(c, &aa);
+  // s21_from_decimal_to_float(aa, &aaa);
+  // printf("float c: %.8f\n", aaa);
+
+  //***************************************************************//
+
+  // s21_decimal z = {0};
+  // s21_decimal x = {0};
+
+  // z.bits[0] = 0x000EB0B1;
+  // x.bits[0] = 0x000EB0B0;
+
+  // // z.bits[2] = 0xEE019612;
+  // // x.bits[2] = 0xEE019612;
+  // z.bits[3] = 3 << 16;
+  // x.bits[3] = 2 << 16;
+
+  // float zz = 0;
+  // float xx = 0;
+  // s21_from_decimal_to_float(z, &zz);
+  // s21_from_decimal_to_float(x, &xx);
+
+  // printf("z: ");
+  // print_decimal_bits(z);
+  // printf("float z: %.8f\n", zz);
+  // printf("x: ");
+  // print_decimal_bits(x);
+  // printf("float x: %.8f\n", xx);
+
+  // int l = s21_is_less(z, x);
+
+  // printf("z < x: %d\n", l);
 
   return 0;
 }
+
+// 721351540736.000000
+// 721351564935
