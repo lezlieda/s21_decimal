@@ -1,50 +1,49 @@
 #include "s21_decimal.h"
 
 int main() {
-  s21_bigdecimal a = {0};
-  a.bits[0] = 918919191;
-  a.bits[1] = 1;
-  a.bits[3] = 0xF << 28;
-  a.bits[4] = 0xF << 28;
-  a.bits[5] = 0xF << 28;
-  a.bits[6] = 0xF << 28;
-  a.bits[7] = 5 << 16;
-  print_uint_bits(a.bits[6]);
-  printf("a:\n");
-  print_bigdecimal_bits(a);
-  right_shift_big(&a, 45);
-  printf("a >> 45:\n");
-  print_bigdecimal_bits(a);
-
+  // s21_bigdecimal a = {0};
   // s21_bigdecimal b = {0};
-  // b.bits[0] = 785;
-  // printf("b:\n");
-  // print_bigdecimal_bits(b);
-  // bigdec_to_decimal(b, &aa);
-  // s21_from_decimal_to_float(aa, &aaa);
-  // printf("float b: %.8f\n", aaa);
+
+  // a.bits[1] = 0xF00EB0B0;
+  // b.bits[0] = 0xC0C1D1C;
 
   // s21_bigdecimal c = {0};
-  // mul_bigdec_noscale(a, b, &c);
-  // c.bits[7] = 5 << 16;
+
+  // printf("a: \n");
+  // print_bigdecimal_bits(a);
+
+  // printf("b: \n");
+  // print_bigdecimal_bits(b);
+
+  // div_bigdec(a, b, &c);
+
+  // printf("c: \n");
   // print_bigdecimal_bits(c);
 
-  // bigdec_to_decimal(c, &aa);
-  // s21_from_decimal_to_float(aa, &aaa);
-  // printf("float c: %.8f\n", aaa);
+  int a = 0b1010100001;
+  int b = 0b111;
+  int c = 0;
+
+  printf("a: %d\n", a);
+  print_int_bits(a);
+  printf("b: %d\n", b);
+  print_int_bits(b);
+
+  int z = div_words(a, b, &c);
+
+  printf("z: %d\n", z);
+
+  printf("c: %d\n", c);
+  print_int_bits(c);
 
   //***************************************************************//
 
   // s21_decimal z = {0};
   // s21_decimal x = {0};
 
-  // z.bits[0] = 0x000EB0B1;
-  // x.bits[0] = 0x000EB0B0;
-
   // // z.bits[2] = 0xEE019612;
-  // // x.bits[2] = 0xEE019612;
-  // z.bits[3] = 3 << 16;
-  // x.bits[3] = 2 << 16;
+  // x.bits[0] = 0xEE019612;
+  // z.bits[3] = 1 << 31;
 
   // float zz = 0;
   // float xx = 0;
@@ -61,6 +60,14 @@ int main() {
   // int l = s21_is_less(z, x);
 
   // printf("z < x: %d\n", l);
+
+  // s21_bigdecimal xxx = {0};
+  // s21_bigdecimal zzz = {0};
+  // decimal_to_bigdec(x, &xxx);
+  // decimal_to_bigdec(z, &zzz);
+
+  // printf("is_zero(x): %d\n", is_bigdec_zero(xxx));
+  // printf("is_zero(z): %d\n", is_bigdec_zero(zzz));
 
   return 0;
 }

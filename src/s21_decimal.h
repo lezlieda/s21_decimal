@@ -80,6 +80,10 @@ int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2);
 
 int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 
+int div_words(int a, int b, int *res);
+int div_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
+               s21_bigdecimal *result);
+
 void bigdec_mul_by_10(s21_bigdecimal *src);
 void bigdec_div_by_10(s21_bigdecimal *src);
 void bigdec_equilizer(s21_bigdecimal *a, s21_bigdecimal *b);

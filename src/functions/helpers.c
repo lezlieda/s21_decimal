@@ -186,15 +186,6 @@ void right_shift_big(s21_bigdecimal *src, int shift) {
   }
 }
 
-// s21_bigdecimal right_shift_big(s21_bigdecimal src, int shift) {
-//   s21_bigdecimal tmp = {0};
-//   tmp.bits[7] = src.bits[7];
-//   for (int i = 0; i < 223 - shift; i++) {
-//     if (get_bigdec_bit(src, i + shift)) set_bigdec_bit(&tmp, i);
-//   }
-//   return tmp;
-// }
-
 void print_uint_bits(int64_t num) {
   for (int i = 63; i >= 0; i--) {
 #ifdef __APPLE__
@@ -294,27 +285,6 @@ void bigdec_mul_by_10(s21_bigdecimal *src) {
   set_bigdec_scale(src, scale + 1);
 }
 
-// void bigdec_div_by_10(s21_bigdecimal *src) {
-//   s21_bigdecimal q = {0};
-//   s21_bigdecimal r = {0};
-//   s21_bigdecimal n = *src;
-//   int scale = get_bigdec_scale(*src);
-//   add_bigdec_noscale(right_shift_big(n, 1), right_shift_big(n, 2), &q);
-//   add_bigdec_noscale(q, right_shift_big(n, 5), &q);
-//   add_bigdec_noscale(q, right_shift_big(n, 8), &q);
-//   add_bigdec_noscale(q, right_shift_big(n, 16), &q);
-//   q = right_shift_big(q, 3);
-//   s21_bigdecimal q10 = q;
-//   bigdec_mul_by_10(&q10);
-//   sub_bigdec_noscale(n, q10, &r);
-//   s21_bigdecimal r6 = {0};
-//   r6.bits[0] = 6;
-//   add_bigdec_noscale(r, r6, &r);
-//   add_bigdec_noscale(q, right_shift_big(r, 4), src);
-//   // add_bigdec_noscale(q, right_shift_big(r, 9), src);
-//   set_bigdec_scale(src, scale - 1);
-// }
-
 int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
                        s21_bigdecimal *res) {
   *res = (s21_bigdecimal){0};
@@ -348,11 +318,9 @@ void scale_equilizer_bigdec(s21_bigdecimal *a, s21_bigdecimal *b) {
 }
 
 int is_bigdec_zero(s21_bigdecimal src) {
-  int flag = 1;
-  for (int i = 0; i < 223; i++) {
-    if (get_bigdec_bit(src, i)) flag = 0;
-  }
-  return flag;
+  int i = 223;
+  while (i >= 0 && !get_bigdec_bit(src, i)) i--;
+  return i == -1;
 }
 
 // int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
@@ -398,10 +366,10 @@ int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2) {
   scale_equilizer_bigdec(&bigdec_1, &bigdec_2);
   int sign_1 = get_bigdec_sign(bigdec_1);
   int sign_2 = get_bigdec_sign(bigdec_2);
-  if (sign_1 == 0 && sign_2 == 1) {
+  if (is_bigdec_zero(bigdec_1) && is_bigdec_zero(bigdec_2)) {
     result = 0;
-  } else if (sign_1 == 1 && sign_2 == 0) {
-    result = 1;
+  } else if (sign_1 ^ sign_2) {
+    result = sign_1;
   } else {
     int i = 223;
     while (i >= 0) {
@@ -420,8 +388,82 @@ int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2) {
   return result;
 }
 
-// int div_words(int a, int b, int *res) {
-//   int error = 0;
-
-//   return error;
+// int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2) {
+//   int result = 0;
+//   scale_equilizer_bigdec(&bigdec_1, &bigdec_2);
+//   int sign_1 = get_bigdec_sign(bigdec_1);
+//   int sign_2 = get_bigdec_sign(bigdec_2);
+//   if (sign_1 == 0 && sign_2 == 1) {
+//     result = 0;
+//   } else if (sign_1 == 1 && sign_2 == 0) {
+//     result = 1;
+//   } else {
+//     int i = 223;
+//     while (i >= 0) {
+//       if (get_bigdec_bit(bigdec_1, i) < get_bigdec_bit(bigdec_2, i)) {
+//         result = sign_1 == 0 ? 1 : 0;
+//         i = 0;
+//       } else if (get_bigdec_bit(bigdec_1, i) > get_bigdec_bit(bigdec_2, i)) {
+//         result = sign_1 == 0 ? 0 : 1;
+//         i = 0;
+//       } else {
+//         result = 0;
+//       }
+//       i--;
+//     }
+//   }
+//   return result;
 // }
+
+int is_not_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
+  return !is_equal_bigdec(value_1, value_2);
+}
+
+int is_less_or_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
+  return is_less_bigdec(value_1, value_2) || is_equal_bigdec(value_1, value_2);
+}
+
+int is_greater_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
+  return !is_less_or_equal_bigdec(value_1, value_2);
+}
+
+int is_greater_or_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
+  return !is_less_bigdec(value_1, value_2) || is_equal_bigdec(value_1, value_2);
+}
+
+int div_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
+               s21_bigdecimal *result) {
+  int error = 0;
+  s21_bigdecimal res = (s21_bigdecimal){0};
+  s21_bigdecimal a = value_a;
+  printf("==ss==================================\n");
+  for (int i = 223; i >= 0; i--) {
+    s21_bigdecimal b = value_b;
+    left_shift_big(&b, i);
+    if (is_greater_or_equal_bigdec(a, b)) {
+      error += div_bigdec(a, b, &a);
+      s21_bigdecimal adds = (s21_bigdecimal){0};
+      adds.bits[0] = 1;
+      left_shift_big(&adds, i);
+      error += sub_bigdec_noscale(res, adds, &res);
+    }
+  }
+  *result = res;
+  return error;
+}
+
+int div_words(int a, int b, int *res) {
+  unsigned int tmp_a = 0xFFFFFFFF & a;
+  unsigned int tmp_b = 0xFFFFFFFF & b;
+  unsigned int tmp_res = 0;
+  printf("==ss==================================\n");
+  for (int i = 31; i >= 0; i--) {
+    if (tmp_a >= tmp_b << i) {
+      tmp_a -= tmp_b << i;
+      tmp_res += (1 << i);
+    }
+  }
+  *res = tmp_res;
+
+  return tmp_a;
+}
