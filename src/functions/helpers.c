@@ -102,12 +102,17 @@ void decimal_to_bigdec(s21_decimal src, s21_bigdecimal *dst) {
   dst->bits[7] = src.bits[3];
 }
 
-void bigdec_to_decimal(s21_bigdecimal src, s21_decimal *dst) {
+int bigdec_to_decimal(s21_bigdecimal src, s21_decimal *dst) {
+  int error = 0;
   *dst = (s21_decimal){0};
   dst->bits[0] = src.bits[0];
   dst->bits[1] = src.bits[1];
   dst->bits[2] = src.bits[2];
   dst->bits[3] = src.bits[7];
+  for (int i = 3; i < 7; i++) {
+    if (src.bits[i] & 0xFFFFFFF) error = 1;
+  }
+  return error;
 }
 
 void print_bigdecimal_bits(s21_bigdecimal num) {
@@ -323,23 +328,6 @@ int is_bigdec_zero(s21_bigdecimal src) {
   return i == -1;
 }
 
-// int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-//   int error = 0;
-//   if (result == NULL) {
-//     error = 1;
-//   } else {
-//     s21_bigdecimal big_1 = {0};
-//     s21_bigdecimal big_2 = {0};
-//     s21_bigdecimal big_res = {0};
-//     decimal_to_bigdec(value_1, &big_1);
-//     decimal_to_bigdec(value_2, &big_2);
-//     bigdec_equilizer(&big_1, &big_2);
-//     add_bigdec_noscale(big_1, big_2, &big_res);
-
-//   }
-//   return error;
-// }
-
 int is_equal_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2) {
   int result = 0;
   scale_equilizer_bigdec(&bigdec_1, &bigdec_2);
@@ -375,14 +363,15 @@ int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2) {
     while (i >= 0) {
       if (get_bigdec_bit(bigdec_1, i) < get_bigdec_bit(bigdec_2, i)) {
         result = sign_1 == 0 ? 1 : 0;
-        i = 0;
+        i = -1;
       } else if (get_bigdec_bit(bigdec_1, i) > get_bigdec_bit(bigdec_2, i)) {
         result = sign_1 == 0 ? 0 : 1;
-        i = 0;
+        i = -1;
       } else {
-        result = 0;
+        // result = 0;
+        i--;
       }
-      i--;
+      // i--;
     }
   }
   return result;
@@ -431,32 +420,51 @@ int is_greater_or_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
   return !is_less_bigdec(value_1, value_2) || is_equal_bigdec(value_1, value_2);
 }
 
-int div_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
-               s21_bigdecimal *result) {
+int div_int_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
+                   s21_bigdecimal *result) {
   int error = 0;
-  s21_bigdecimal res = (s21_bigdecimal){0};
-  s21_bigdecimal a = value_a;
-  printf("==ss==================================\n");
+  s21_bigdecimal tmp_r = (s21_bigdecimal){0};
+  s21_bigdecimal tmp_a = (s21_bigdecimal)value_a;
   for (int i = 223; i >= 0; i--) {
-    s21_bigdecimal b = value_b;
-    left_shift_big(&b, i);
-    if (is_greater_or_equal_bigdec(a, b)) {
-      error += div_bigdec(a, b, &a);
-      s21_bigdecimal adds = (s21_bigdecimal){0};
-      adds.bits[0] = 1;
-      left_shift_big(&adds, i);
-      error += sub_bigdec_noscale(res, adds, &res);
+    s21_bigdecimal tmp_b = value_b;
+    left_shift_big(&tmp_b, i);
+    if (is_greater_or_equal_bigdec(tmp_a, tmp_b)) {
+      error = sub_bigdec_noscale(tmp_a, tmp_b, &tmp_a);
+      if (i < 223) set_bigdec_bit(&tmp_r, i);
     }
   }
-  *result = res;
+  *result = (s21_bigdecimal)tmp_r;
   return error;
+}
+
+void div_by_10(s21_bigdecimal *value) {
+  s21_bigdecimal tmp = *value;
+  int scale = get_bigdec_scale(*value);
+  s21_bigdecimal ten = (s21_bigdecimal){0};
+  ten.bits[0] = 0xA;
+  div_int_bigdec(tmp, ten, &tmp);
+  set_bigdec_scale(&tmp, scale - 1);
+  *value = tmp;
+}
+
+void compress_bigdec(s21_bigdecimal *src) {
+  s21_bigdecimal tmp = *src;
+  int scale = get_bigdec_scale(*src);
+  int count = 0;
+  while (is_equal_bigdec(tmp, *src)) {
+    div_by_10(&tmp);
+    set_bigdec_scale(&tmp, --scale);
+    count++;
+  }
+  for (int i = count - 1; i > 0; i--) {
+    div_by_10(src);
+  }
 }
 
 int div_words(int a, int b, int *res) {
   unsigned int tmp_a = 0xFFFFFFFF & a;
   unsigned int tmp_b = 0xFFFFFFFF & b;
   unsigned int tmp_res = 0;
-  printf("==ss==================================\n");
   for (int i = 31; i >= 0; i--) {
     if (tmp_a >= tmp_b << i) {
       tmp_a -= tmp_b << i;
