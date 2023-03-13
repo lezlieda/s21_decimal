@@ -283,11 +283,13 @@ int sub_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
 
 void bigdec_mul_by_10(s21_bigdecimal *src) {
   s21_bigdecimal tmp = *src;
+  int sign = get_bigdec_sign(*src);
   int scale = get_bigdec_scale(*src);
   left_shift_big(src, 3);
   left_shift_big(&tmp, 1);
   add_bigdec_noscale(*src, tmp, src);
   set_bigdec_scale(src, scale + 1);
+  set_bigdec_sign(src, sign);
 }
 
 int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
@@ -447,7 +449,7 @@ void div_by_10(s21_bigdecimal *value) {
   *value = tmp;
 }
 
-void compress_bigdec(s21_bigdecimal *src) {
+void bigdec_zero_remover(s21_bigdecimal *src) {
   s21_bigdecimal tmp = *src;
   int scale = get_bigdec_scale(*src);
   int count = 0;
@@ -459,6 +461,32 @@ void compress_bigdec(s21_bigdecimal *src) {
   for (int i = count - 1; i > 0; i--) {
     div_by_10(src);
   }
+}
+
+int is_mantissa_big(s21_bigdecimal value) {
+  int result = 0;
+  for (int i = 3; i < 7; i++) {
+    if (value.bits[i] != 0) {
+      result = 1;
+      i = 7;
+    }
+  }
+  return result;
+}
+
+void bigdec_mantissa_round(s21_bigdecimal *src) {
+  s21_bigdecimal max_decimal = {
+      {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0, 0, 0, 0, 0}};
+  s21_bigdecimal tmp = *src;
+  int sign = get_bigdec_sign(tmp);
+  set_bigdec_sign(&tmp, 0);
+  if (is_mantissa_big(tmp) && is_less_or_equal_bigdec(tmp, max_decimal)) {
+    while (is_mantissa_big(tmp)) {
+      div_by_10(&tmp);
+    }
+  }
+  set_bigdec_sign(&tmp, sign);
+  *src = tmp;
 }
 
 int div_words(int a, int b, int *res) {

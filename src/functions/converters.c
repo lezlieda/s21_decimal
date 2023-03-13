@@ -21,7 +21,7 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
     error = 1;
   } else {
     int scale = get_dec_scale(src);
-    double data = 0;
+    long double data = 0;
     unsigned int tmp = 0;
     for (int i = 0; i < 3; i++) {
       tmp = 0xFFFFFFFF & src.bits[i];
@@ -32,7 +32,7 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
       data = -data;
       if (data == 0) data = -0.;
     }
-    printf("  data = %.8lf\n", data);
+    printf("  data = %.8Lf\n", data);
     *dst = (float)data;
   }
 

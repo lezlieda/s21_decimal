@@ -74,8 +74,11 @@ int words_sub(int a, int b, int *sub);
 int sub_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 
 void scale_equilizer_bigdec(s21_bigdecimal *a, s21_bigdecimal *b);
-void compress_bigdec(s21_bigdecimal *src);
+void bigdec_zero_remover(s21_bigdecimal *src);
 void div_by_10(s21_bigdecimal *value);
+
+int is_mantissa_big(s21_bigdecimal value);
+void bigdec_mantissa_round(s21_bigdecimal *src);
 
 void print_uint_bits(int64_t num);
 void print_int_bits(int num);

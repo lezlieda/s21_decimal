@@ -12,15 +12,17 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   s21_bigdecimal val_1 = (s21_bigdecimal){0};
   s21_bigdecimal val_2 = (s21_bigdecimal){0};
   s21_bigdecimal val_r = (s21_bigdecimal){0};
+  int sign_1 = get_dec_bit(value_1, 127);
+  int sign_2 = get_dec_bit(value_2, 127);
   decimal_to_bigdec(value_1, &val_1);
   decimal_to_bigdec(value_2, &val_2);
   scale_equilizer_bigdec(&val_1, &val_2);
   int scale = get_bigdec_scale(val_1);
-  int sign_1 = get_bigdec_sign(val_1);
-  int sign_2 = get_bigdec_sign(val_2);
   set_bigdec_sign(&val_1, 0);
   set_bigdec_sign(&val_2, 0);
   int bigger = is_greater_or_equal_bigdec(val_1, val_2);
+  printf("bigger = %d; sign_1 ^ sign_2 = %d, sign1 = %d; sign2 = %d\n", bigger,
+         sign_1 ^ sign_2, sign_1, sign_2);
   if (sign_1 ^ sign_2) {
     if (bigger) {
       sub_bigdec_noscale(val_1, val_2, &val_r);
@@ -34,8 +36,10 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     set_bigdec_sign(&val_r, sign_1);
   }
   set_bigdec_scale(&val_r, scale);
+  // bigdec_zero_remover(&val_r);
+  bigdec_mantissa_round(&val_r);
   error = bigdec_to_decimal(val_r, result);
-  if (error && get_bigdec_sign(val_r)) error = 2;
+  if (error == 1 && get_bigdec_sign(val_r)) error = 2;
   return error;
 }
 
