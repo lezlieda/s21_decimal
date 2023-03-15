@@ -292,17 +292,16 @@ void bigdec_mul_by_10(s21_bigdecimal *src) {
   set_bigdec_sign(src, sign);
 }
 
-int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b,
+int bigdec_mul_noscale(s21_bigdecimal a, s21_bigdecimal b,
                        s21_bigdecimal *res) {
   *res = (s21_bigdecimal){0};
   int error = 0;
-  s21_bigdecimal zero = (s21_bigdecimal){0};
-  while (!is_equal_bigdec(b, zero) && !error) {
-    if (b.bits[0] & 1) {
-      error = add_bigdec_noscale(*res, a, res);
+  for (int i = 0; i < 224; i++) {
+    if (get_bigdec_bit(b, i)) {
+      s21_bigdecimal temp = a;
+      left_shift_big(&temp, i);
+      add_bigdec_noscale(*res, temp, res);
     }
-    left_shift_big(&a, 1);
-    right_shift_big(&b, 1);
   }
   return error;
 }
@@ -422,7 +421,7 @@ int is_greater_or_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2) {
   return !is_less_bigdec(value_1, value_2) || is_equal_bigdec(value_1, value_2);
 }
 
-int div_int_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
+int bigdec_div_int(s21_bigdecimal value_a, s21_bigdecimal value_b,
                    s21_bigdecimal *result) {
   int error = 0;
   s21_bigdecimal tmp_r = (s21_bigdecimal){0};
@@ -439,12 +438,12 @@ int div_int_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
   return error;
 }
 
-void div_by_10(s21_bigdecimal *value) {
+void bigdec_div_by_10(s21_bigdecimal *value) {
   s21_bigdecimal tmp = *value;
   int scale = get_bigdec_scale(*value);
   s21_bigdecimal ten = (s21_bigdecimal){0};
   ten.bits[0] = 0xA;
-  div_int_bigdec(tmp, ten, &tmp);
+  bigdec_div_int(tmp, ten, &tmp);
   set_bigdec_scale(&tmp, scale - 1);
   *value = tmp;
 }
@@ -454,12 +453,13 @@ void bigdec_zero_remover(s21_bigdecimal *src) {
   int scale = get_bigdec_scale(*src);
   int count = 0;
   while (is_equal_bigdec(tmp, *src)) {
-    div_by_10(&tmp);
+    bigdec_div_by_10(&tmp);
     set_bigdec_scale(&tmp, --scale);
     count++;
   }
+  printf("count = %d\n", count);
   for (int i = count - 1; i > 0; i--) {
-    div_by_10(src);
+    bigdec_div_by_10(src);
   }
 }
 
@@ -482,7 +482,7 @@ void bigdec_mantissa_round(s21_bigdecimal *src) {
   set_bigdec_sign(&tmp, 0);
   if (is_mantissa_big(tmp) && is_less_or_equal_bigdec(tmp, max_decimal)) {
     while (is_mantissa_big(tmp)) {
-      div_by_10(&tmp);
+      bigdec_div_by_10(&tmp);
     }
   }
   set_bigdec_sign(&tmp, sign);

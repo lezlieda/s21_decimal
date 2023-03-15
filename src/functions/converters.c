@@ -32,31 +32,30 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
       data = -data;
       if (data == 0) data = -0.;
     }
-    printf("  data = %.8Lf\n", data);
+    printf("  data = %.28Lf\n", data);
     *dst = (float)data;
   }
 
   return error;
 }
 
-// int s21_from_decimal_to_int(s21_decimal src, int *dst) {
-//   int error = 0;
-//   if (dst == NULL) {
-//     error = 1;
-//   } else {  // здесь следует использовать функцию s21_truncate, а потом
-//             // записывать младшее слово
-//     float frac = 0;
-//     float tmp = 0;
-//     s21_from_decimal_to_float(src, &tmp);
-//     tmp = modff(tmp, &frac);
-//     if (tmp > __INT_MAX__ || tmp < __WINT_MIN__) {
-//       error = 1;
-//     } else {
-//       *dst = (int)tmp;
-//     }
-//   }
-//   return error;
-// }
+int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+  int error = 0;
+  if (dst == NULL) {
+    error = 1;
+  } else {
+    int sign = get_dec_sign(src);
+    s21_decimal trun = {0};
+    s21_truncate(src, &trun);
+    if (trun.bits[2] || trun.bits[1] || get_dec_bit(trun, 31)) {
+      error = 1;
+    } else {
+      *dst = trun.bits[0];
+      if (sign) *dst = -*dst;
+    }
+  }
+  return error;
+}
 
 // int s21_from_float_to_decimal(float src, s21_decimal *dst) {
 //   int error = 0;

@@ -43,6 +43,15 @@ int s21_is_greater(s21_decimal value_1, s21_decimal value_2);
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_less(s21_decimal value_1, s21_decimal value_2);
 
+// Другие функции
+int s21_truncate(s21_decimal value, s21_decimal *result);
+int s21_negate(s21_decimal value, s21_decimal *result);
+
+// Арифметические операторы
+int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+
 // Вспомогательные функции
 int get_dec_bit(s21_decimal src, int pos);
 void set_dec_bit(s21_decimal *dst, int pos);
@@ -65,9 +74,6 @@ void set_bigdec_bit(s21_bigdecimal *dst, int pos);
 int is_bigdec_zero(s21_bigdecimal src);
 void set_bigdec_sign(s21_bigdecimal *dst, int sign);
 
-int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
-int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
-
 int words_sum(int a, int b, int *sum);
 int add_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 int words_sub(int a, int b, int *sub);
@@ -87,10 +93,10 @@ int is_equal_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2);
 int is_less_bigdec(s21_bigdecimal bigdec_1, s21_bigdecimal bigdec_2);
 int is_greater_or_equal_bigdec(s21_bigdecimal value_1, s21_bigdecimal value_2);
 
-int mul_bigdec_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
+int bigdec_mul_noscale(s21_bigdecimal a, s21_bigdecimal b, s21_bigdecimal *res);
 
 int div_words(int a, int b, int *res);
-int div_int_bigdec(s21_bigdecimal value_a, s21_bigdecimal value_b,
+int bigdec_div_int(s21_bigdecimal value_a, s21_bigdecimal value_b,
                    s21_bigdecimal *result);
 
 void bigdec_mul_by_10(s21_bigdecimal *src);
